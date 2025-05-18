@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Quora Tech Feed</title>
+  <style>
+    /* (Unchanged CSS: kept same as your provided version) */
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f8fb;
+      color: #1a1a1a;
+    }
+
+    nav {
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      color: white;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1rem;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    nav a {
+      color: #e0f7fa;
+      text-decoration: none;
+      margin-left: 15px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-top: 30px;
+      color: #064273;
+      font-size: 2.5em;
+      
+    }
+
+    .post-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      padding: 30px;
+    }
+
+    .post {
+      background: linear-gradient(to bottom right, #e0f7fa, #ffffff);
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .post:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 123, 255, 0.3);
+    }
+
+    .user {
+      font-style: italic;
+      color: #0077cc;
+      font-size: 0.95em;
+      margin-bottom: 10px;
+    }
+
+    .content {
+      margin-bottom: 15px;
+      font-size: 1.1em;
+    }
+
+    .actions {
+      font-size: 0.95em;
+      margin-bottom: 10px;
+    }
+
+    .actions a,
+    .actions button {
+      margin-right: 10px;
+      color: #064273;
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .actions button:hover {
+      text-decoration: none;
+    }
+
+    .actions form {
+      display: inline;
+    }
+
+    .footer {
+      text-align: center;
+      margin: 40px 0;
+    }
+
+    a.create-link {
+      display: inline-block;
+      margin-top: 20px;
+      background-color: #0077cc;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      text-decoration: none;
+      transition: background-color 0.2s ease;
+    }
+
+    a.create-link:hover {
+      background-color: #005fa3;
+    }
+
+    .comment-section {
+      margin-top: 15px;
+      border-top: 1px solid #ccc;
+      padding-top: 10px;
+    }
+
+    .comment {
+      margin-bottom: 8px;
+      font-size: 0.95em;
+    }
+
+    .comment strong {
+      color: #333;
+    }
+
+    .comment-form input[type="text"] {
+      width: 80%;
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      margin-right: 5px;
+    }
+
+    .comment-form button {
+      padding: 5px 10px;
+      border: none;
+      background-color: #0077cc;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .comment-form button:hover {
+      background-color: #005fa3;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div><strong>Quora Tech</strong></div>
+  <div>
+    <% if (currentUser) { %>
+      Logged in as @<%= currentUser %>
+      <a href="/logout">Logout</a>
+      <a href="/users/<%= currentUser %>/notifications">Notifications</a>
+    <% } else { %>
+      <a href="/login">Login</a>
+      <a href="/signup">Sign Up</a>
+    <% } %>
+  </div>
+</nav>
+
+<h1>Tech Discussions</h1>
+
+<div class="post-grid">
+  <% posts.forEach(post => { %>
+    <div class="post">
+      <h3 class="user">@<%= post.username %></h3>
+      <h4 class="content"><%= post.content %></h4>
+      <div class="actions">
+          <!-- Edit button -->
+          <a href="/posts/<%= post.id %>/edit">Edit</a>
+
+          <!-- Delete form -->
+          <form method="POST" action="/posts/<%= post.id %>?_method=DELETE" style="display:inline;">
+            <button>Delete</button>
+          </form>
+      </div>
+
+      <div class="comment-section">
+        <!-- Comment list -->
+        <% if (post.comments && post.comments.length > 0) { %>
+          <% post.comments.forEach(comment => { %>
+            <div class="comment">
+              <strong>@<%= comment.username %></strong>: <%= comment.text %>
+            </div>
+          <% }) %>
+        <% } %>
+
+        <!-- Comment form -->
+        <% if (currentUser) { %>
+          <form class="comment-form" action="/posts/<%= post.id %>/comments" method="POST">
+            <input type="text" name="comment" placeholder="Write a comment..." required />
+            <button type="submit">Comment</button>
+          </form>
+        <% } else { %>
+          <p><em>Login to comment</em></p>
+        <% } %>
+      </div>
+    </div>
+  <% }) %>
+</div>
+
+
+<div class="footer">
+  <% if (currentUser) { %>
+    <a class="create-link" href="/posts/new">Create New Post</a>
+  <% } else { %>
+    <p><a href="/login" class="create-link">Login to create a new post</a></p>
+  <% } %>
+</div>
+
+</body>
+</html>
